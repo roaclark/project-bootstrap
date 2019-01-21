@@ -1,0 +1,42 @@
+{
+  extends: [
+    eslint:recommended,
+    plugin:react/recommended,
+    plugin:flowtype/recommended,
+    prettier,
+    prettier/flowtype,
+    prettier/react,
+    prettier/babel,
+  ],
+  parser: babel-eslint,
+  env: {
+    browser: true,
+    node: true,
+  },
+  plugins: [
+    react,
+    babel,
+    import,
+    prettier,
+    flowtype,
+    flowtype-errors,
+  ],
+  settings: {
+    react: {
+      version: latest,
+    },
+  },
+  rules: {
+    flowtype-errors/show-errors: 2,
+    react/jsx-uses-vars: error,
+    react/jsx-uses-react: error,
+    prettier/prettier: [
+      error,
+      {
+        singleQuote: true,
+        semi: false,
+        trailingComma: all,
+      }
+    ]
+  },
+}
