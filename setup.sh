@@ -81,7 +81,11 @@ cp -R "$(dirname "../${BASH_SOURCE[0]}")/client" .
 
 echo "Initalizing Express backend..."
 npm install --save express
+npm install --save-dev nodemon
 cp "$(dirname "../${BASH_SOURCE[0]}")/app.tmpl.js" ./app.js
 
 tmp=$(mktemp)
-jq '.scripts += { "start:server": "node app.js", start: "node app.js" }' package.json > "$tmp" && mv "$tmp" package.json
+jq '.scripts += {
+    "start:server": "nodemon app.js",
+    start: "node app.js" }' \
+package.json > "$tmp" && mv "$tmp" package.json
