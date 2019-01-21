@@ -41,7 +41,11 @@ cp "$(dirname "../${BASH_SOURCE[0]}")/webpack.config.tmpl.js" ./webpack.config.j
 cp "$(dirname "../${BASH_SOURCE[0]}")/.babelrc.tmpl" ./.babelrc
 
 tmp=$(mktemp)
-jq '.scripts += { build: "webpack --mode production", client: "webpack-dev-server --mode development" }' package.json > "$tmp" && mv "$tmp" package.json
+jq '.scripts += {
+    build: "webpack --mode production",
+    postinstall: "webpack --mode production",
+    "start:client": "webpack-dev-server --mode development" }' \
+package.json > "$tmp" && mv "$tmp" package.json
 
 
 echo "Initalizing ESLint and Prettier..."
@@ -80,4 +84,4 @@ npm install --save express
 cp "$(dirname "../${BASH_SOURCE[0]}")/app.tmpl.js" ./app.js
 
 tmp=$(mktemp)
-jq '.scripts += { server: "node app.js" }' package.json > "$tmp" && mv "$tmp" package.json
+jq '.scripts += { "start:server": "node app.js", start: "node app.js" }' package.json > "$tmp" && mv "$tmp" package.json
