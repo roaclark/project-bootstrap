@@ -6,7 +6,7 @@ import styles from './styles.css'
 
 export default class App extends Component<*, *> {
   async componentDidMount() {
-    const response = await fetch('api')
+    const response = await fetch('$API_ENDPOINT')
     const message = response.ok
       ? await response.text()
       : 'The server is sad. :('

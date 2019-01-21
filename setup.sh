@@ -8,6 +8,8 @@ else
     exit 1
 fi
 
+export API_ENDPOINT=${API_ENDPOINT:=api}
+
 echo "Creating project $project..."
 mkdir "$project"
 cd "$project"
@@ -37,7 +39,7 @@ npm install --save-dev \
     css-loader
 npm install --save @babel/polyfill
 
-cp "$(dirname "../${BASH_SOURCE[0]}")/webpack.config.tmpl.js" ./webpack.config.js
+envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/webpack.config.tmpl.js" > ./webpack.config.js
 cp "$(dirname "../${BASH_SOURCE[0]}")/.babelrc.tmpl" ./.babelrc
 
 tmp=$(mktemp)
@@ -77,12 +79,13 @@ npm run flow init
 echo "Initializing React client entry..."
 npm install --save react react-dom
 cp -R "$(dirname "../${BASH_SOURCE[0]}")/client" .
+envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/client/src/app.jsx" > ./client/src/app.jsx
 
 
 echo "Initalizing Express backend..."
 npm install --save express
 npm install --save-dev nodemon
-cp "$(dirname "../${BASH_SOURCE[0]}")/app.tmpl.js" ./app.js
+envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/app.tmpl.js" > ./app.js
 
 tmp=$(mktemp)
 jq '.scripts += {

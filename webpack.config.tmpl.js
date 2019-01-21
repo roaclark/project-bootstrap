@@ -54,7 +54,7 @@ module.exports = {
     proxy: {
       // Enabled local development with a backend
       // https://webpack.js.org/configuration/dev-server/#devserver-proxy
-      '/api': {
+      '/$API_ENDPOINT': {
         target: 'http://localhost:3000',
         secure: false,
       },
