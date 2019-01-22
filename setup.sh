@@ -31,9 +31,12 @@ npm install --save-dev \
     webpack-dev-server \
     webpack-cli \
     html-webpack-plugin \
+    @babel/cli \
     @babel/core \
     @babel/preset-env \
     @babel/preset-react \
+    @babel/plugin-transform-runtime \
+    @babel/runtime \
     babel-loader \
     mini-css-extract-plugin \
     css-loader
@@ -44,8 +47,7 @@ cp "$(dirname "../${BASH_SOURCE[0]}")/.babelrc.tmpl" ./.babelrc
 
 tmp=$(mktemp)
 jq '.scripts += {
-    build: "webpack --mode production",
-    postinstall: "webpack --mode production",
+    "build:client": "webpack --mode production",
     "start:client": "webpack-dev-server --mode development" }' \
 package.json > "$tmp" && mv "$tmp" package.json
 
@@ -69,11 +71,7 @@ npm install --save-dev \
     @babel/preset-flow \
     eslint-plugin-flowtype \
     eslint-plugin-flowtype-errors
-
-tmp=$(mktemp)
-jq '.scripts += { flow: "flow" }' package.json > "$tmp" && mv "$tmp" package.json
-
-npm run flow init
+npx flow init
 
 
 echo "Initializing React client entry..."
@@ -84,11 +82,21 @@ envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/client/src/app.jsx
 
 echo "Initalizing Express backend..."
 npm install --save express
-npm install --save-dev nodemon
-envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/app.tmpl.js" > ./app.js
+npm install --save-dev nodemon @babel/node
+mkdir -p server/src
+envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/app.tmpl.js" > ./server/src/app.js
 
 tmp=$(mktemp)
 jq '.scripts += {
-    "start:server": "nodemon app.js",
-    start: "node app.js" }' \
+    "build:server": "babel ./server/src --out-dir ./server/dist --delete-dir-on-start",
+    "start:server": "nodemon --exec babel-node server/src/app.js",
+    start: "node server/dist/app.js" }' \
+package.json > "$tmp" && mv "$tmp" package.json
+
+
+echo "Adding additional build scripts..."
+tmp=$(mktemp)
+jq '.scripts += {
+    build: "npm run build:client && npm run build:server",
+    postinstall: "npm run build" }' \
 package.json > "$tmp" && mv "$tmp" package.json
