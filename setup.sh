@@ -8,11 +8,21 @@ else
     exit 1
 fi
 
+command -v envsubst >/dev/null 2>&1 || { echo >&2 "Error: envsubst is not available."; exit 1; }
+command -v jq >/dev/null 2>&1 || { echo >&2 "Error: jq is not available."; exit 1; }
+
 export API_ENDPOINT=${API_ENDPOINT:=api}
 
+if [[ -L "${BASH_SOURCE[0]}" ]];
+then
+    sourcedir=$( dirname $(readlink ${BASH_SOURCE[0]}) )
+else
+    sourcedir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+fi
+
 echo "Creating project $project..."
-mkdir "$project"
-cd "$project"
+mkdir -p "$project"
+pushd "$project" >/dev/null
 
 
 echo "Initalizing project..."
@@ -21,8 +31,8 @@ npm init -f
 
 
 echo "Creating README and .gitignore files..."
-echo "# ${project}" | cat - "$(dirname "../${BASH_SOURCE[0]}")/readme.tmpl.md" > ./README.md
-cp "$(dirname "../${BASH_SOURCE[0]}")/.gitignore.tmpl" ./.gitignore
+echo "# ${project}" | cat - "$sourcedir/readme.tmpl.md" > ./README.md
+cp "$sourcedir/.gitignore.tmpl" ./.gitignore
 
 
 echo "Initalizing Webpack and Babel..."
@@ -42,8 +52,8 @@ npm install --save-dev \
     css-loader
 npm install --save @babel/polyfill
 
-envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/webpack.config.tmpl.js" > ./webpack.config.js
-cp "$(dirname "../${BASH_SOURCE[0]}")/.babelrc.tmpl" ./.babelrc
+envsubst '$API_ENDPOINT' < "$sourcedir/webpack.config.tmpl.js" > ./webpack.config.js
+cp "$sourcedir/.babelrc.tmpl" ./.babelrc
 
 tmp=$(mktemp)
 jq '.scripts += {
@@ -62,7 +72,7 @@ npm install --save-dev \
     babel-eslint \
     eslint-plugin-babel \
     prettier
-cp "$(dirname "../${BASH_SOURCE[0]}")/.eslintrc.tmpl" ./.eslintrc
+cp "$sourcedir/.eslintrc.tmpl" ./.eslintrc
 
 
 echo "Initializing Flow typing..."
@@ -76,15 +86,15 @@ npx flow init
 
 echo "Initializing React client entry..."
 npm install --save react react-dom
-cp -R "$(dirname "../${BASH_SOURCE[0]}")/client" .
-envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/client/src/app.jsx" > ./client/src/app.jsx
+cp -R "$sourcedir/client" .
+envsubst '$API_ENDPOINT' < "$sourcedir/client/src/app.jsx" > ./client/src/app.jsx
 
 
 echo "Initalizing Express backend..."
 npm install --save express
 npm install --save-dev nodemon @babel/node
 mkdir -p server/src
-envsubst '$API_ENDPOINT' < "$(dirname "../${BASH_SOURCE[0]}")/app.tmpl.js" > ./server/src/app.js
+envsubst '$API_ENDPOINT' < "$sourcedir/app.tmpl.js" > ./server/src/app.js
 
 tmp=$(mktemp)
 jq '.scripts += {
