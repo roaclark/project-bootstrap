@@ -105,7 +105,5 @@ package.json > "$tmp" && mv "$tmp" package.json
 
 echo "Adding additional build scripts..."
 tmp=$(mktemp)
-jq '.scripts += {
-    build: "npm run build:client && npm run build:server",
-    postinstall: "npm run build" }' \
+jq '.scripts += { build: "npm run build:client && npm run build:server" }' \
 package.json > "$tmp" && mv "$tmp" package.json
