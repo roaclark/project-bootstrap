@@ -46,11 +46,10 @@ npm install --save-dev \
     @babel/preset-env \
     @babel/preset-react \
     @babel/plugin-transform-runtime \
-    @babel/runtime \
     babel-loader \
     mini-css-extract-plugin \
     css-loader
-npm install --save @babel/polyfill
+npm install --save @babel/polyfill @babel/runtime
 
 envsubst '$API_ENDPOINT' < "$sourcedir/webpack.config.tmpl.js" > ./webpack.config.js
 cp "$sourcedir/.babelrc.tmpl" ./.babelrc
