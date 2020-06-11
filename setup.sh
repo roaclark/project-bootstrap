@@ -72,6 +72,7 @@ npm install --save-dev \
     eslint-plugin-babel \
     prettier
 cp "$sourcedir/.eslintrc.yml.tmpl" ./.eslintrc.yml
+cp "$sourcedir/.prettierrc.yml.tmpl" ./.prettierrc.yml
 
 
 echo "Initializing Flow typing..."
